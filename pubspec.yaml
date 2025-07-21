@@ -2,6 +2,7 @@ name: app_message
 description: "A new Flutter package project."
 version: 0.0.1
 homepage: https://dannynguyen.vn/packages
+repository: https://github.com/haidang93/app_message.git
 
 environment:
   sdk: ^3.8.1
