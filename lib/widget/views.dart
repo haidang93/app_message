@@ -43,11 +43,15 @@ class AppMessage extends StatefulWidget {
     this.child,
     this.titleStyle,
     this.messageStyle,
+    this.textDirection,
+    this.locale,
   });
   final AppMessageController? controller;
   final TextStyle? titleStyle;
   final TextStyle? messageStyle;
   final Widget? child;
+  final TextDirection? textDirection;
+  final Locale? locale;
 
   /// In order for AppMessage to work. AppMessage should wrap the
   /// top level of your application, typically the Material.
@@ -99,9 +103,13 @@ class AppMessage extends StatefulWidget {
 class AppMessageState extends State<AppMessage>
     with SingleTickerProviderStateMixin {
   late AppMessageController controller;
+  Locale locale = Locale('en');
+
   @override
   void initState() {
     super.initState();
+    locale = widget.locale ?? WidgetsBinding.instance.platformDispatcher.locale;
+
     controller = widget.controller ?? AppMessageController();
     controller.onInit(this, setState, context);
   }
@@ -112,10 +120,30 @@ class AppMessageState extends State<AppMessage>
     super.dispose();
   }
 
+  TextDirection getTextDirection() {
+    switch (widget.locale?.languageCode) {
+      case 'ar': // Arabic
+      case 'arc': // Aramaic
+      case 'dv': // Dhivehi/Maldivian
+      case 'fa': // Persian (Farsi)
+      case 'he': // Hausa (when written in Arabic script)
+      case 'ha': // Hebrew
+      case 'khw': // Khowar
+      case 'ks': // Kashmiri
+      case 'ku': // Kurdish (Sorani)
+      case 'ps': // Pashto
+      case 'ur': // Urdu
+      case 'yi': // Yiddish
+        return TextDirection.rtl;
+      default:
+        return TextDirection.ltr;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: TextDirection.ltr,
+      textDirection: widget.textDirection ?? getTextDirection(),
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
