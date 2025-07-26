@@ -24,43 +24,41 @@ Future showAppMessage({
   Widget? titleWidget,
   String? message,
   Widget? messageWidget,
-  Widget? icon,
   int showDuration = 5,
   Duration animationDuration = const Duration(milliseconds: 400),
   AppMessageType type = AppMessageType.information,
+  AppMessageStyle? style,
   Function(BuildContext context)? onTap,
-  Color? textColor,
-  Color? backgroundColor,
-  Color? indicatorColor,
   Curve curve = Curves.ease,
   EdgeInsetsGeometry? padding,
+  double opacity = 1,
 }) async {
   final state = AppMessage.of(context);
   if (state != null) {
-    final controller = state.controller;
+    final controller = state._controller;
     controller.showMessage(
+      theme: Theme.of(context),
       title: title,
       titleWidget: titleWidget,
       message: message,
       messageWidget: messageWidget,
       type: type,
-      icon: icon,
+      style: style,
       showDuration: showDuration,
       onTap: onTap,
       animationDuration: animationDuration,
-      textColor: textColor,
-      backgroundColor: backgroundColor,
       curve: curve,
-      indicatorColor: indicatorColor,
       padding: padding,
+      opacity: opacity,
     );
   }
 }
 
+/// To dismiss shown message
 void clearAppMessage(BuildContext context) {
   final state = AppMessage.of(context);
   if (state != null) {
-    final controller = state.controller;
+    final controller = state._controller;
     controller.clearMessage();
   }
 }

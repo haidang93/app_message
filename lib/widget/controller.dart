@@ -1,106 +1,121 @@
 part of '../app_message.dart';
 
+/// A controller for an AppMessage.
+///
+/// This class lets you perform tasks such as:
+///
+/// * Show message [showMessage]
+/// * Dismiss message [clearMessage].
+///
 class AppMessageController {
-  AnimationController? animationController;
-  Animation<Offset>? slideAnimation;
-  Animation<double>? opacityAnimation;
-  bool show = false;
-  double opacity = 0;
-  Timer? timer;
+  AnimationController? _animationController;
+  Animation<Offset>? _slideAnimation;
+  Animation<double>? _opacityAnimation;
+  bool _show = false;
+  double _opacity = 1;
+  Timer? _timer;
 
   String? _title;
   Widget? _titleWidget;
   String? _message;
   Widget? _messageWidget;
-  Color? _backgroundColor;
-  Color? _indicatorColor;
-  Color? _textColor;
-  Widget? _icon;
+  AppMessageStyle? _style;
+  ThemeData? _theme;
   EdgeInsetsGeometry? _padding;
   Function(BuildContext context)? _onTap;
 
-  late void Function(void Function()) setState;
-  late BuildContext context;
+  late void Function(void Function()) _setState;
+  late BuildContext _context;
+  late CustomAppMessageType? _customAppMessageType;
 
-  void onInit(
+  void _onInit(
     TickerProvider vsync,
     void Function(void Function()) fn,
     BuildContext ct,
+    CustomAppMessageType? camt,
   ) {
-    context = ct;
-    setState = fn;
-    animationController ??= AnimationController(
+    _context = ct;
+    _setState = fn;
+    _customAppMessageType = camt;
+    _animationController ??= AnimationController(
       vsync: vsync,
       duration: const Duration(milliseconds: 300),
     );
   }
 
-  void onClose() {
-    timer?.cancel();
-    animationController?.dispose();
+  void _onClose() {
+    _timer?.cancel();
+    _animationController?.dispose();
   }
 
+  /// Show message
   void showMessage({
     String? title,
     Widget? titleWidget,
     String? message,
     Widget? messageWidget,
+    ThemeData? theme,
     AppMessageType type = AppMessageType.information,
-    Color? backgroundColor,
-    Color? indicatorColor,
-    Color? textColor,
-    Widget? icon,
+    AppMessageStyle? style,
     Duration animationDuration = const Duration(milliseconds: 400),
     int showDuration = 5,
+    double opacity = 1,
     Curve curve = Curves.ease,
     Function(BuildContext context)? onTap,
     EdgeInsetsGeometry? padding,
   }) {
-    if (!context.mounted) {
+    if (!_context.mounted) {
       return;
     }
     _title = title;
     _titleWidget = titleWidget;
     _message = message;
     _messageWidget = messageWidget;
-    _backgroundColor = backgroundColor ?? type.backgroundColor;
-    _indicatorColor = indicatorColor ?? type.indicatorColor;
-    _textColor = textColor ?? type.contentColor;
-    _icon = icon ?? type.icon;
     _padding = padding;
     _onTap = onTap;
+    _opacity = opacity;
+    _theme = theme;
 
-    timer?.cancel();
-    animationController?.duration = animationDuration;
-    slideAnimation = Tween<Offset>(
+    if (style != null) {
+      _style = style;
+    } else if (_customAppMessageType?._getStyle(type) != null) {
+      _style = _customAppMessageType?._getStyle(type);
+    } else {
+      _style = type._style;
+    }
+
+    _timer?.cancel();
+    _animationController?.duration = animationDuration;
+    _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: animationController!, curve: curve));
-    opacityAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: animationController!, curve: Curves.ease),
+    ).animate(CurvedAnimation(parent: _animationController!, curve: curve));
+    _opacityAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animationController!, curve: Curves.ease),
     );
-    setState(() {
-      show = true;
+    _setState(() {
+      _show = true;
     });
-    animationController!.reset();
-    animationController!.forward();
-    timer = Timer(Duration(seconds: showDuration), () async {
+    _animationController!.reset();
+    _animationController!.forward();
+    _timer = Timer(Duration(seconds: showDuration), () async {
       await _timerDismiss();
     });
   }
 
   Future _timerDismiss() async {
-    await animationController!.reverse();
-    setState(() {
-      show = false;
+    await _animationController!.reverse();
+    _setState(() {
+      _show = false;
     });
   }
 
+  /// dismiss the shown message
   void clearMessage() {
-    timer?.cancel();
-    timer = null;
-    setState(() {
-      show = false;
+    _timer?.cancel();
+    _timer = null;
+    _setState(() {
+      _show = false;
     });
   }
 }

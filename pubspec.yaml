@@ -1,6 +1,6 @@
 name: app_message
-description: "A lightweight, customizable Flutter library that allows you to display animated, dismissible banner messages at the top of your app. It’s ideal for showing alerts, toasts, and app-wide notifications with a clean and consistent design."
-version: 1.0.1
+description: "A lightweight, customizable Flutter library that allows you to display animated, dismissible banner messages at the top of your app."
+version: 1.0.2
 homepage: https://dannynguyen.vn/packages
 repository: https://github.com/haidang93/app_message.git
 
